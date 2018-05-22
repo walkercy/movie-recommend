@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.movie.ycsaddas.vo.MovieVO;
 import com.movie.ycsaddas.vo.PersonVO;
 import lombok.extern.slf4j.Slf4j;
+import sun.awt.ModalExclude;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -17,21 +18,61 @@ import java.util.Map;
  */
 @Slf4j
 public class MovieUtils {
+
+	public static final String INTHEATERS = "threaters";
+	public static final String COMMINGS = "commings";
+
 	/**
 	 * 查询电影缓存
 	 */
-	public static Map<String, List<MovieVO>> movieMap = new HashMap<>();
+	public static Map<String, List<MovieVO>> movieListMap = new HashMap<>();
+	public static Map<String, MovieVO> movieMap = new HashMap<>();
 
-	public static void main(String[] args) {
-		try {
-			List<MovieVO> movieList = parseMovies(DoubanClient.getInTheaters());
-			System.out.println(movieList.size());
-			movieList.forEach(movie -> System.out.println(movie.toString()));
-		} catch (Exception e) {
-			e.printStackTrace();
+	public static List<MovieVO> getInTheatersForIndex() throws Exception {
+		List<MovieVO> allTheaters = getInTheaters();
+		List<MovieVO> result = new ArrayList<>();
+		for (int i = 0; i < 6; i++) {
+			result.add(allTheaters.get(i));
 		}
+		return result;
 	}
 
+	public static List<MovieVO> getCommingSoonForIndex() throws Exception {
+		List<MovieVO> allCommings = getCommingSoon();
+		List<MovieVO> result = new ArrayList<>();
+		for (int i = 0; i < 6; i++) {
+			result.add(allCommings.get(i));
+		}
+		return result;
+	}
+
+	public static List<MovieVO> getInTheaters() throws Exception {
+		if (movieListMap.get(INTHEATERS) == null) {
+			movieListMap.put(INTHEATERS, parseMovies(DoubanClient.getInTheaters()));
+		}
+		return movieListMap.get(INTHEATERS);
+	}
+
+	public static List<MovieVO> getCommingSoon() throws Exception {
+		if (movieListMap.get(COMMINGS) == null) {
+			movieListMap.put(COMMINGS, parseMovies(DoubanClient.getCommingSoon()));
+		}
+		return movieListMap.get(COMMINGS);
+	}
+
+	public static MovieVO getDetail(String id) throws Exception {
+		if (movieMap.get(id) == null ) {
+			movieMap.put(id, parseMovieDetail(DoubanClient.getMovieDetail(id)));
+		}
+		return movieMap.get(id);
+	}
+
+	/**
+	 * 转化电影列表数据为ArrayList
+	 *
+	 * @param movies 豆瓣API返回数据
+	 * @return
+	 */
 	private static List<MovieVO> parseMovies(String movies) {
 		List<MovieVO> movieList = new ArrayList<>();
 		JSONArray subjects = JSONObject.parseObject(movies).getJSONArray("subjects");
@@ -47,6 +88,11 @@ public class MovieUtils {
 		return movieList;
 	}
 
+	/**
+	 * 将单个电影详情转化为MovieVO对象
+	 * @param movies
+	 * @return
+	 */
 	private static MovieVO parseMovieDetail(String movies) {
 		MovieVO movie = new MovieVO();
 		JSONObject subject = JSONObject.parseObject(movies);
@@ -70,6 +116,18 @@ public class MovieUtils {
 		movie.setActors(actors);
 		movie.setOriginal_title(subject.getString("original_title"));
 		movie.setSummary(subject.getString("summary"));
+		List<PersonVO> directors = new ArrayList<>();
+		subject.getJSONArray("directors").forEach(obj -> {
+			JSONObject cast = (JSONObject) obj;
+			PersonVO director = new PersonVO();
+			director.setId(cast.getString("id"));
+			director.setName(cast.getString("name"));
+			director.setImg(cast.getJSONObject("avatars").getString("large"));
+			directors.add(director);
+		});
+		movie.setDirector(directors);
+		movie.setRatings_count(subject.getIntValue("ratings_count"));
+		movie.setAka(subject.getJSONArray("aka").toJavaList(String.class));
 		return movie;
 	}
 }
