@@ -3,6 +3,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <meta name="referrer" content="never">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <!-- 新 Bootstrap4 核心 CSS 文件 -->
     <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/4.0.0-beta/css/bootstrap.min.css">
@@ -46,13 +47,13 @@
     <!-- 轮播图片 -->
     <div class="carousel-inner">
         <div class="carousel-item active">
-            <img src="/images/index1.jpg">
+            <img src="http://image13.m1905.cn/uploadfile/2018/0514/20180514095931272662.jpg">
         </div>
         <div class="carousel-item">
-            <img src="http://image14.m1905.cn/uploadfile/2018/0410/20180410094202157349.jpg">
+            <img src="http://image14.m1905.cn/uploadfile/2018/0523/20180523015730101727.jpg">
         </div>
         <div class="carousel-item">
-            <img src="http://image11.m1905.cn/uploadfile/2018/0322/20180322092343811155.jpg">
+            <img src="http://image14.m1905.cn/uploadfile/2018/0416/20180416100719512951.jpg">
         </div>
     </div>
 
@@ -67,15 +68,15 @@
 
 <div style="margin-top: 30px">
     <div class="container">
-        <a href="/lay"><h3 style="color: #000;">即将上映</h3><hr></a>
+        <a href="/list/coming_soon"><h3 style="color: #000;">即将上映</h3><hr></a>
     </div>
 </div>
 
 <div class="container">
     <div class = "row" id="comming">
         <div class="col-md-2 movie" th:each="comming : ${commings}">
-            <a th:value="${comming.id}">
-                <img class="col-md-12 cover" th:src="${comming.img}" alt="通用的占位符缩略图">
+            <a th:href="'/detail/' + ${comming.id}">
+                <img class="col-md-12 cover" th:src="${comming.img}">
             </a>
             <div class="caption">
                 <h7 th:text="${comming.name}"></h7><br>
@@ -89,14 +90,16 @@
 
 <div style="margin-top: 30px">
     <div class="container">
-        <a href="/lay"><h3 style="color: #000;">最受欢迎</h3><hr></a>
+        <a href="/list/in_theaters"><h3 style="color: #000;">最受欢迎</h3><hr></a>
     </div>
 </div>
 
 <div class="container">
     <div class = "row">
         <div class="col-md-2 movie" th:each="threater : ${threaters}">
-            <img class="col-md-12 cover" th:src="${threater.img}" alt="通用的占位符缩略图">
+            <a th:href="'/detail/' + ${threater.id}">
+                <img class="col-md-12 cover" th:src="${threater.img}">
+            </a>
             <div class="caption">
                 <h7 th:text="${threater.name}"></h7><br>
                 <span>评分：</span><h7 th:text="${threater.average}"></h7>

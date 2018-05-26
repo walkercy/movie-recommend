@@ -46,6 +46,14 @@ public class MovieUtils {
 		return result;
 	}
 
+	public static List<MovieVO> getMovies(String key) throws Exception {
+		return getMovies(key, 0, 20);
+	}
+
+	public static List<MovieVO> getMovies(String key, int start, int count) throws Exception {
+		return parseMovies(DoubanClient.getMovies(key, start, count));
+	}
+
 	public static List<MovieVO> getInTheaters() throws Exception {
 		if (movieListMap.get(INTHEATERS) == null) {
 			movieListMap.put(INTHEATERS, parseMovies(DoubanClient.getInTheaters()));
@@ -60,6 +68,12 @@ public class MovieUtils {
 		return movieListMap.get(COMMINGS);
 	}
 
+	/**
+	 * 获取电影详情
+	 * @param id
+	 * @return
+	 * @throws Exception
+	 */
 	public static MovieVO getDetail(String id) throws Exception {
 		if (movieMap.get(id) == null ) {
 			movieMap.put(id, parseMovieDetail(DoubanClient.getMovieDetail(id)));
@@ -125,7 +139,7 @@ public class MovieUtils {
 			director.setImg(cast.getJSONObject("avatars").getString("large"));
 			directors.add(director);
 		});
-		movie.setDirector(directors);
+		movie.setDirectors(directors);
 		movie.setRatings_count(subject.getIntValue("ratings_count"));
 		movie.setAka(subject.getJSONArray("aka").toJavaList(String.class));
 		return movie;

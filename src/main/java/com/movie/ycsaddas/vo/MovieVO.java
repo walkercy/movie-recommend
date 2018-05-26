@@ -29,7 +29,7 @@ public class MovieVO {
 	// 看过人数
 	private int count;
 	// 导演
-	private List<PersonVO> director;
+	private List<PersonVO> directors;
 	// 又名
 	private List<String> aka;
 	// 国家

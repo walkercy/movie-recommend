@@ -20,6 +20,8 @@
         padding-top: 10px;
     }
     .caption {margin-top: 10px; margin-left: 15px;}
+    h3 {display: inline}
+
 </style>
 <body>
 
@@ -31,59 +33,74 @@
                 <div class="row" style="padding-top: 100px">
                     <div class="col">
                         <div class="title">
-                            <h3>无限战争</h3><h3>fdslfjs</h3>
+                            <h3 th:text="${movie.name}" style="padding-right: 10px"></h3>
+                            <h3 th:if="${movie.name ne movie.original_title}" th:text="${movie.original_title}"></h3>
                         </div>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-md-3 image">
-                        <img src="https://img3.doubanio.com/view/photo/s_ratio_poster/public/p2522331945.jpg" style="width:100%;">
+                        <img th:src="${movie.img}" style="width:100%;">
                     </div>
                     <div class="col-md-6" style="padding-top: 5px">
-                        导演：<span>sdlfjsd</span><br>
-                        主演：<span>sdlfjsd</span><br>
-                        类型：<span>sdlfjsd</span><br>
-                        制片国家/地区：<span>sdlfjsd</span><br>
-                        上映年份：<span>sdlfjsd</span><br>
-                        又名：<span>sdlfjsd水电费水电费水电费的身份水电费都是范德萨发</span><br>
+                        导演：<span th:each="dir : ${movie.directors}" th:text="${dir.name + '/'}"></span><br>
+                        主演：<span th:each="acotr : ${movie.actors}" th:text="${acotr.name + '/'}"></span><br>
+                        类型：<span th:each="genre : ${movie.genres}" th:text="${genre + '/'}"></span><br>
+                        制片国家/地区：<span th:each="country : ${movie.countries}" th:text="${country + '/'}"></span><br>
+                        上映年份：<span th:text="${movie.year}"></span><br>
+                        又名：<span th:each="a : ${movie.aka}" th:text="${a + '/'}"></span><br>
                     </div>
                     <div class="col-md-3">
                         <small>豆瓣评分:</small>
-                        <h4>8.4</h4>
+                        <h4 th:text="${movie.average}"></h4>
                         <hr>
                         <small>评分人数：</small>
-                        <h4>1234</h4>
+                        <h4 th:text="${movie.ratings_count}"></h4>
                         <hr>
                         <small>看过人数：</small>
-                        <h4>1234</h4>
+                        <h4 th:text="${movie.count}"></h4>
                     </div>
                 </div>
-                <div class="row" style="padding-top: 30px">
+                <div class="row" style="padding-top: 40px">
                     <div class="col">
                         <h5>剧情简介</h5>
-                        <h7>故事发生在二十世纪三十年代的民国，山西一个偏远的小山村。村里的保长为了趋炎附势，把自己的女儿嫁给了县长的儿子，并从女儿口中辗转得知了一条旱涝保收的消息：在村里建个“李忆莲祠堂”，就可以获得县里拨发的巨额救济粮和银元。虽然不太明白县里的意思，但是贪财的保长立马勾搭了村里的族长，开始筹谋这桩买卖。</h7>
+                        <h7 th:text="${movie.summary}"></h7>
                     </div>
                 </div>
-                <div class="row" style="padding-top: 30px">
+                <div class="row" style="padding-top: 40px">
                     <div class="col">
-                        <h5>影人</h5>
+                        <h5>导演</h5>
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-3 image">
-                        <img src="https://img3.doubanio.com/view/celebrity/s_ratio_celebrity/public/p1464837085.91.jpg" style="width:100%;">
+                    <div class="col-md-3 image" th:each="director : ${movie.directors}">
+                        <img th:src="${director.img}" style="width:100%;">
                         <div class="caption">
-                            <span>张佳宁</span>
+                            <span th:text="${director.name}"></span>
                         </div>
                     </div>
-                    <div class="col-md-3 image">
-                        <img src="https://img3.doubanio.com/view/celebrity/s_ratio_celebrity/public/p1464837085.91.jpg" style="width:100%;">
+                </div>
+                <div class="row" style="padding-top: 40px">
+                    <div class="col">
+                        <h5>主演</h5>
                     </div>
-                    <div class="col-md-3 image">
-                        <img src="https://img3.doubanio.com/view/celebrity/s_ratio_celebrity/public/p34642.jpg" style="width:100%;">
+                </div>
+                <div class="row">
+                    <div class="col-md-3 image" th:each="actor : ${movie.actors}">
+                        <img th:src="${actor.img}" style="width:100%;">
+                        <div class="caption">
+                            <span th:text="${actor.name}"></span>
+                        </div>
                     </div>
-                    <div class="col-md-3 image">
-                        <img src="https://img3.doubanio.com/view/photo/s_ratio_poster/public/p2522331945.jpg" style="width:100%;">
+                </div>
+                <div class="row" style="padding-top: 40px">
+                    <div class="col">
+                        <h5>评论</h5>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="input-group image col-md-12" style="height: 200px; padding-bottom: 50px">
+                        <textarea class="form-control" aria-label="With textarea" placeholder="写下你的评论......"></textarea>
                     </div>
                 </div>
             </div>

@@ -9,13 +9,21 @@ package com.movie.ycsaddas.common;
 public class DoubanClient {
 
 	private static final String BASE_MOVIE_URL = "https://api.douban.com/v2/movie/";
-	private static final String IN_THEATERS = "in_theaters";
-	private static final String COMMING_SOON = "coming_soon";
-	private static final String TOP_250 = "top250";
+	public static final String IN_THEATERS = "in_theaters";
+	public static final String COMMING_SOON = "coming_soon";
+	public static final String TOP_250 = "top250";
 	private static final String MOVIE_DETAIL = "subject/";
 	private static final String ACTOR_DETAIL = "celebrity/";
 	private static final String QUERY_BY_SUBJECT = "search?q=";
 	private static final String QUERY_BY_TYPE = "search?tag=";
+
+	public static String getMovies(String uri) throws Exception {
+		return getMovies(uri, 0, 20);
+	}
+
+	public static String getMovies(String uri, int start, int count) throws Exception {
+		return HttpClientUtils.get(getUrl(uri + "?start=" + start + "&count=" + count));
+	}
 
 	public static String getInTheaters() throws Exception {
 		return HttpClientUtils.get(getUrl(IN_THEATERS));

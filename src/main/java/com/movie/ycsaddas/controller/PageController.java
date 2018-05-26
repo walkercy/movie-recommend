@@ -1,5 +1,6 @@
 package com.movie.ycsaddas.controller;
 
+import com.movie.ycsaddas.common.DoubanClient;
 import com.movie.ycsaddas.common.MovieUtils;
 import com.movie.ycsaddas.common.UserLoginUtil;
 import com.movie.ycsaddas.entity.User;
@@ -8,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -27,8 +29,8 @@ public class PageController {
 		ModelAndView mav = new ModelAndView("index");
 		movieService.getMovies().forEach((k, v) -> mav.addObject(k, v));
 		try {
-			mav.addObject(MovieUtils.INTHEATERS, MovieUtils.getInTheatersForIndex());
-			mav.addObject(MovieUtils.COMMINGS, MovieUtils.getCommingSoonForIndex());
+			mav.addObject(MovieUtils.INTHEATERS, MovieUtils.getMovies(DoubanClient.IN_THEATERS, 0, 6));
+			mav.addObject(MovieUtils.COMMINGS, MovieUtils.getMovies(DoubanClient.COMMING_SOON, 0, 6));
 
 			User user = UserLoginUtil.currentUser;
 			if (user != null) {
@@ -47,8 +49,21 @@ public class PageController {
 		return mav;
 	}
 
-	@GetMapping(value = "/detail")
-	public ModelAndView detail(@RequestParam String id) {
+	@GetMapping(value = "/list/{catagory}")
+	public ModelAndView list(@PathVariable(value = "catagory") String catagory) {
+		log.info("请求电影列表 ：" + catagory);
+		ModelAndView mav = new ModelAndView("list");
+		try {
+			mav.addObject("movies", MovieUtils.getMovies(catagory, 0, 24));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return mav;
+	}
+
+	@GetMapping(value = "/detail/{id}")
+	public ModelAndView detail(@PathVariable(value = "id") String id) {
+		log.info("movie id = " + id);
 		ModelAndView mav = new ModelAndView("detail");
 		try {
 			mav.addObject("movie", MovieUtils.getDetail(id));
