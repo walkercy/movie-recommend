@@ -35,7 +35,7 @@ public class UserController {
 		}
 		UserLoginUtil.userLoginMap.put(loginUser.getId(), UserLoginUtil.login);
 		UserLoginUtil.currentUser = loginUser;
-		return "redirect:/index";
+		return "redirect:/";
 	}
 
 	@PostMapping(value = "/sign_up")
@@ -53,7 +53,7 @@ public class UserController {
 	public void logout(HttpServletResponse response) {
 		UserLoginUtil.currentUser = null;
 		try {
-			response.sendRedirect("/index");
+			response.sendRedirect("/");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

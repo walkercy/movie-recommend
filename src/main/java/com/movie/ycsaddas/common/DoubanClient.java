@@ -14,7 +14,6 @@ public class DoubanClient {
 	public static final String TOP_250 = "top250";
 	private static final String MOVIE_DETAIL = "subject/";
 	private static final String ACTOR_DETAIL = "celebrity/";
-	private static final String QUERY_BY_SUBJECT = "search?q=";
 	private static final String QUERY_BY_TYPE = "search?tag=";
 
 	public static String getMovies(String uri) throws Exception {
@@ -45,12 +44,8 @@ public class DoubanClient {
 		return HttpClientUtils.get(getUrl(ACTOR_DETAIL, actorId));
 	}
 
-	public static String queryBySubject(String subject) throws Exception {
-		return HttpClientUtils.get(getUrl(QUERY_BY_SUBJECT, subject));
-	}
-
-	public static String queryByType(String type) throws Exception {
-		return HttpClientUtils.get(getUrl(QUERY_BY_TYPE, type));
+	public static String queryByType(String type, int start, int count) throws Exception {
+		return HttpClientUtils.get(getUrl(QUERY_BY_TYPE + type) + "&start=" + start + "&count=" + count);
 	}
 
 	private static String getUrl(String path) {

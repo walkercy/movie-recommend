@@ -28,22 +28,8 @@ public class MovieUtils {
 	public static Map<String, List<MovieVO>> movieListMap = new HashMap<>();
 	public static Map<String, MovieVO> movieMap = new HashMap<>();
 
-	public static List<MovieVO> getInTheatersForIndex() throws Exception {
-		List<MovieVO> allTheaters = getInTheaters();
-		List<MovieVO> result = new ArrayList<>();
-		for (int i = 0; i < 6; i++) {
-			result.add(allTheaters.get(i));
-		}
-		return result;
-	}
-
-	public static List<MovieVO> getCommingSoonForIndex() throws Exception {
-		List<MovieVO> allCommings = getCommingSoon();
-		List<MovieVO> result = new ArrayList<>();
-		for (int i = 0; i < 6; i++) {
-			result.add(allCommings.get(i));
-		}
-		return result;
+	public static List<MovieVO> searchForMovies(String keyWord, int start, int count) throws Exception {
+		return parseMovies(DoubanClient.queryByType(keyWord, start, count));
 	}
 
 	public static List<MovieVO> getMovies(String key) throws Exception {
@@ -110,6 +96,9 @@ public class MovieUtils {
 	private static MovieVO parseMovieDetail(String movies) {
 		MovieVO movie = new MovieVO();
 		JSONObject subject = JSONObject.parseObject(movies);
+		if (subject != null) {
+			log.info(subject.toJSONString());
+		}
 		movie.setId(subject.getString("id"));
 		movie.setImg(subject.getJSONObject("images").getString("large"));
 		movie.setAverage(subject.getJSONObject("rating").getFloat("average"));
@@ -118,14 +107,27 @@ public class MovieUtils {
 		movie.setCountries(subject.getJSONArray("countries").toJavaList(String.class));
 		movie.setGenres(subject.getJSONArray("genres").toJavaList(String.class));
 		movie.setCount(subject.getIntValue("collect_count"));
+		log.info(movie.toString());
 		List<PersonVO> actors = new ArrayList<>();
 		subject.getJSONArray("casts").forEach(obj -> {
 			JSONObject cast = (JSONObject) obj;
-			PersonVO actor = new PersonVO();
-			actor.setId(cast.getString("id"));
-			actor.setName(cast.getString("name"));
-			actor.setImg(cast.getJSONObject("avatars").getString("large"));
-			actors.add(actor);
+			if (cast == null) {
+				log.info("actor cast is null");
+			} else {
+				log.info(cast.toJSONString());
+				PersonVO actor = new PersonVO();
+				if (cast.getString("name") != null) {
+					actor.setName(cast.getString("name"));
+					if (cast.getJSONObject("avatars") != null) {
+						actor.setImg(cast.getJSONObject("avatars").getString("large"));
+					} else {
+						actor.setImg("/images/default.png");
+					}
+				} else {
+					actor = null;
+				}
+				actors.add(actor);
+			}
 		});
 		movie.setActors(actors);
 		movie.setOriginal_title(subject.getString("original_title"));
@@ -133,15 +135,28 @@ public class MovieUtils {
 		List<PersonVO> directors = new ArrayList<>();
 		subject.getJSONArray("directors").forEach(obj -> {
 			JSONObject cast = (JSONObject) obj;
-			PersonVO director = new PersonVO();
-			director.setId(cast.getString("id"));
-			director.setName(cast.getString("name"));
-			director.setImg(cast.getJSONObject("avatars").getString("large"));
-			directors.add(director);
+			if (cast == null) {
+				log.info("director cast is null");
+			} else {
+				log.info(cast.toJSONString());
+				PersonVO director = new PersonVO();
+				if (cast.getString("name") != null) {
+					director.setName(cast.getString("name"));
+					if (cast.getJSONObject("avatars") != null) {
+						director.setImg(cast.getJSONObject("avatars").getString("large"));
+					} else {
+						director.setImg("/images/default.png");
+					}
+				} else {
+					director = null;
+				}
+				directors.add(director);
+			}
 		});
 		movie.setDirectors(directors);
 		movie.setRatings_count(subject.getIntValue("ratings_count"));
 		movie.setAka(subject.getJSONArray("aka").toJavaList(String.class));
+		log.info(movie.toString());
 		return movie;
 	}
 }
