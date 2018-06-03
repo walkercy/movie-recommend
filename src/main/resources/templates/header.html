@@ -24,25 +24,25 @@
     <div class="collapse navbar-collapse" id="navbarCollapse">
         <ul class="navbar-nav mr-auto">
             <li class="nav-item active">
-                <a class="nav-link" href="#"><h5>私人角度</h5><span class="sr-only">(current)</span></a>
+                <a class="nav-link" href="/"><h5>私人角度</h5><span class="sr-only">(current)</span></a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="#">喜剧</a>
+                <a class="nav-link" href="/search?key=喜剧">喜剧</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="#">动作</a>
+                <a class="nav-link" href="/search?key=动作">动作</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="#">恐怖</a>
+                <a class="nav-link" href="/search?key=恐怖">恐怖</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="#">爱情</a>
+                <a class="nav-link" href="/search?key=爱情">爱情</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="#">悬疑</a>
+                <a class="nav-link" href="/search?key=悬疑">悬疑</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="#">排行榜</a>
+                <a class="nav-link" href="/search?key=剧情">剧情</a>
             </li>
         </ul>
         <form class="form-inline mt-2 mt-md-0" action="/search">
@@ -54,7 +54,7 @@
             <button type="button" class="btn btn-outline-primary dropdown-toggle" data-toggle="dropdown" th:text="${name}"></button>
             <div class="dropdown-menu">
                 <a class="dropdown-item" href="#">搜索记录</a>
-                <a class="dropdown-item" href="/api/user/logout">登出</a>
+                <a id="logout" href="/" class="dropdown-item">登出</a>
             </div>
         </div>
     </div>

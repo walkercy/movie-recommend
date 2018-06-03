@@ -44,6 +44,10 @@ public class DoubanClient {
 		return HttpClientUtils.get(getUrl(ACTOR_DETAIL, actorId));
 	}
 
+	public static String queryByType(String type) throws Exception {
+		return HttpClientUtils.get(getUrl(QUERY_BY_TYPE + type));
+	}
+
 	public static String queryByType(String type, int start, int count) throws Exception {
 		return HttpClientUtils.get(getUrl(QUERY_BY_TYPE + type) + "&start=" + start + "&count=" + count);
 	}

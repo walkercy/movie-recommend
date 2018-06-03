@@ -19,6 +19,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 /**
  * @author walker
@@ -42,11 +43,83 @@ public class PageController {
 
 	@GetMapping(value = "/")
 	public ModelAndView index() {
+		System.out.println("index 方法");
 		ModelAndView mav = new ModelAndView("index");
-		movieService.getMovies().forEach((k, v) -> mav.addObject(k, v));
+		List<MovieVO> recommends = new ArrayList<>();
+		List<MovieVO> defaultRecommends = null;
+		try {
+			defaultRecommends = MovieUtils.getTop250();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		if (UserLoginUtil.currentUser != null) {
+			List<RecommendActor> actorList = actorRepository.findTop2ByUserIdOrderByFreqDesc(UserLoginUtil.currentUser.getId());
+			if (actorList == null || actorList.size() == 0) {
+				System.out.println("推荐演员列表为空");
+			} else {
+				System.out.println("推荐演员列表内容如下");
+				for (RecommendActor actor : actorList) {
+					System.out.println(actor.toString());
+					try {
+						List<MovieVO> movies = MovieUtils.searchForMovie(actor.getActor());
+						if (movies.size() == 0) {
+							continue;
+						}
+						Random random = new Random();
+						int index = random.nextInt(movies.size()) + 0;
+						recommends.add(movies.get(index));
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			}
+
+			List<RecommendDirector> directors = directorRepository.findTop2ByUserIdOrderByFreqDesc(UserLoginUtil.currentUser.getId());
+			if (directors == null || directors.size() == 0) {
+				System.out.println("推荐导演列表为空");
+			} else {
+				System.out.println("推荐导演列表内容如下");
+				for(RecommendDirector director : directors) {
+					System.out.println(director.toString());
+					try {
+						List<MovieVO> movies = MovieUtils.searchForMovie(director.getDirector());
+						if (movies.size() == 0) {
+							continue;
+						}
+						Random random = new Random();
+						int index = random.nextInt(movies.size()) + 0;
+						recommends.add(movies.get(index));
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			}
+
+			List<RecommendType> types = typeRepository.findTop2ByUserIdOrderByFreqDesc(UserLoginUtil.currentUser.getId());
+			if (types == null || types.size() == 0) {
+				System.out.println("推荐类型列表为空");
+			} else {
+				System.out.println("推荐类型列表内容如下");
+
+			}
+		} else {
+			try {
+				for (int i = 0; i < 6; i++) {
+					recommends.add(defaultRecommends.get(i));
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		if (recommends.size() < 6) {
+			for (int i = 0; i < 6 - recommends.size(); i++) {
+				recommends.add(defaultRecommends.get(i));
+			}
+		}
 		try {
 			mav.addObject(MovieUtils.INTHEATERS, MovieUtils.getMovies(DoubanClient.IN_THEATERS, 0, 6));
 			mav.addObject(MovieUtils.COMMINGS, MovieUtils.getMovies(DoubanClient.COMMING_SOON, 0, 6));
+			mav.addObject("recommends", recommends);
 			checkUserLogin(mav);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -96,6 +169,7 @@ public class PageController {
 					System.out.println("actors num = " + actors.size());
 					actorRepository.saveAll(actors);
 				}
+
 				List<RecommendDirector> directors = new ArrayList<>();
 				movie.getDirectors().forEach(director -> {
 					RecommendDirector dbdir = directorRepository.findByDirector(director.getName());
@@ -115,6 +189,26 @@ public class PageController {
 				if (directors.size() > 0) {
 					directorRepository.saveAll(directors);
 				}
+
+				List<RecommendType> types = new ArrayList<>();
+				movie.getGenres().forEach(type -> {
+					RecommendType dbtype = typeRepository.findByType(type);
+					if (dbtype != null) {
+						int freq = dbtype.getFreq();
+						freq++;
+						dbtype.setFreq(freq);
+						typeRepository.save(dbtype);
+					} else {
+						RecommendType rtype = new RecommendType();
+						rtype.setFreq(1);
+						rtype.setUserId(UserLoginUtil.currentUser.getId());
+						rtype.setType(type);
+						types.add(rtype);
+					}
+				});
+				if (types.size() > 0) {
+					typeRepository.saveAll(types);
+				}
 			}
 			mav.addObject("movie", movie);
 		} catch (Exception e) {
@@ -129,14 +223,20 @@ public class PageController {
 		ModelAndView mav = new ModelAndView("list");
 		checkUserLogin(mav);
 		try {
-			if (typeRepository.findByType(key) != null) {
-
-			} else {
-				RecommendType type = new RecommendType();
-				type.setFreq(1);
-				type.setType(key);
-				type.setUserId(UserLoginUtil.currentUser.getId());
-				typeRepository.save(type);
+			if (UserLoginUtil.currentUser != null) {
+				RecommendType obj = typeRepository.findByType(key);
+				if (obj != null) {
+					int freq = obj.getFreq();
+					freq++;
+					obj.setFreq(freq);
+					typeRepository.save(obj);
+				} else {
+					RecommendType type = new RecommendType();
+					type.setFreq(1);
+					type.setType(key);
+					type.setUserId(UserLoginUtil.currentUser.getId());
+					typeRepository.save(type);
+				}
 			}
 			mav.addObject("movies", MovieUtils.searchForMovies(key, 0, 24));
 		} catch (Exception e) {

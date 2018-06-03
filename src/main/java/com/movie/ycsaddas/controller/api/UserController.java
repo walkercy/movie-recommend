@@ -32,9 +32,15 @@ public class UserController {
 		User loginUser = userRepository.findByUsername(user.getUsername());
 		if (loginUser != null) {
 			System.out.println("当前登录用户ID是 : " + loginUser.getId());
+			UserLoginUtil.userLoginMap.put(loginUser.getId(), UserLoginUtil.login);
+			UserLoginUtil.currentUser = loginUser;
+		} else {
+			System.out.println("用户还未注册");
+			userRepository.save(user);
+			User newUser = userRepository.findByUsername(user.getUsername());
+			UserLoginUtil.currentUser = newUser;
+			UserLoginUtil.userLoginMap.put(newUser.getId(), UserLoginUtil.login);
 		}
-		UserLoginUtil.userLoginMap.put(loginUser.getId(), UserLoginUtil.login);
-		UserLoginUtil.currentUser = loginUser;
 		return "redirect:/";
 	}
 

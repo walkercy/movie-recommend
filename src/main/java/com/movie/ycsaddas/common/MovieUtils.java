@@ -7,10 +7,7 @@ import com.movie.ycsaddas.vo.PersonVO;
 import lombok.extern.slf4j.Slf4j;
 import sun.awt.ModalExclude;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author walker
@@ -28,6 +25,10 @@ public class MovieUtils {
 	public static Map<String, List<MovieVO>> movieListMap = new HashMap<>();
 	public static Map<String, MovieVO> movieMap = new HashMap<>();
 
+	public static List<MovieVO> searchForMovie(String keyWord) throws Exception {
+		return parseMovies(DoubanClient.queryByType(keyWord));
+	}
+
 	public static List<MovieVO> searchForMovies(String keyWord, int start, int count) throws Exception {
 		return parseMovies(DoubanClient.queryByType(keyWord, start, count));
 	}
@@ -38,6 +39,10 @@ public class MovieUtils {
 
 	public static List<MovieVO> getMovies(String key, int start, int count) throws Exception {
 		return parseMovies(DoubanClient.getMovies(key, start, count));
+	}
+
+	public static List<MovieVO> getTop250() throws Exception {
+		return parseMovies(DoubanClient.getTop250());
 	}
 
 	public static List<MovieVO> getInTheaters() throws Exception {

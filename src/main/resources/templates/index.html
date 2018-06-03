@@ -116,15 +116,16 @@
 
 <div class="container">
     <div class = "row">
-        <div class="col-md-2 movie" th:each="i:${#numbers.sequence(0,5)}">
-            <img class="col-md-12 cover" src="https://img3.doubanio.com/view/photo/s_ratio_poster/public/p2517753454.jpg"
-                 alt="通用的占位符缩略图">
+        <div class="col-md-2 movie" th:each="recommend : ${recommends}">
+            <a th:href="'/detail/' + ${recommend.id}">
+                <img class="col-md-12 cover" th:src="${recommend.img}">
+            </a>
             <div class="caption">
-                <h6><span>缩略图标签</span></h6>
-                <h6>评分：</h6>
+                <h7 th:text="${recommend.name}"></h7><br>
+                <span>评分：</span><h7 th:text="${recommend.average}"></h7>
             </div>
         </div>
-    </div><br><hr><br>
+    </div><br><br><br>
 </div>
 </body>
 </html>
