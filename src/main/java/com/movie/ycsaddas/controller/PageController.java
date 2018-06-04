@@ -7,7 +7,6 @@ import com.movie.ycsaddas.entity.*;
 import com.movie.ycsaddas.repository.ActorRepository;
 import com.movie.ycsaddas.repository.DirectorRepository;
 import com.movie.ycsaddas.repository.TypeRepository;
-import com.movie.ycsaddas.service.MovieService;
 import com.movie.ycsaddas.vo.MovieVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,9 +27,6 @@ import java.util.Random;
 @Slf4j
 @Controller
 public class PageController {
-
-	@Autowired
-	private MovieService movieService;
 
 	@Autowired
 	private ActorRepository actorRepository;
