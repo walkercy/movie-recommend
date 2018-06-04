@@ -28,18 +28,22 @@ import java.util.Random;
 @Controller
 public class PageController {
 
+	// 记录演员频次的增删查改对象
 	@Autowired
 	private ActorRepository actorRepository;
 
+	// 记录导演频次的增删查改对象
 	@Autowired
 	private DirectorRepository directorRepository;
 
+	// 记录电影类型频次的增删查改对象
 	@Autowired
 	private TypeRepository typeRepository;
 
 	@GetMapping(value = "/")
 	public ModelAndView index() {
 		System.out.println("index 方法");
+		// 映射到index.html页面
 		ModelAndView mav = new ModelAndView("index");
 		List<MovieVO> recommends = new ArrayList<>();
 		List<MovieVO> defaultRecommends = null;
@@ -49,6 +53,7 @@ public class PageController {
 			e.printStackTrace();
 		}
 		if (UserLoginUtil.currentUser != null) {
+			// 根据主演推荐电影
 			List<RecommendActor> actorList = actorRepository.findTop2ByUserIdOrderByFreqDesc(UserLoginUtil.currentUser.getId());
 			if (actorList == null || actorList.size() == 0) {
 				System.out.println("推荐演员列表为空");
@@ -70,6 +75,7 @@ public class PageController {
 				}
 			}
 
+			// 根据导演推荐电影
 			List<RecommendDirector> directors = directorRepository.findTop2ByUserIdOrderByFreqDesc(UserLoginUtil.currentUser.getId());
 			if (directors == null || directors.size() == 0) {
 				System.out.println("推荐导演列表为空");
@@ -91,14 +97,29 @@ public class PageController {
 				}
 			}
 
+			// 根据类型推荐电影
 			List<RecommendType> types = typeRepository.findTop2ByUserIdOrderByFreqDesc(UserLoginUtil.currentUser.getId());
 			if (types == null || types.size() == 0) {
 				System.out.println("推荐类型列表为空");
 			} else {
 				System.out.println("推荐类型列表内容如下");
-
+				for (RecommendType type : types) {
+					System.out.println(type.toString());
+					try {
+						List<MovieVO> movies = MovieUtils.searchForMovie(type.getType());
+						if (movies.size() == 0) {
+							continue;
+						}
+						Random random = new Random();
+						int index = random.nextInt(movies.size()) + 0;
+						recommends.add(movies.get(index));
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
 			}
 		} else {
+			// 用户没有登录就推荐TOP250
 			try {
 				for (int i = 0; i < 6; i++) {
 					recommends.add(defaultRecommends.get(i));
@@ -123,6 +144,11 @@ public class PageController {
 		return mav;
 	}
 
+	/**
+	 * 展示电影列表页面
+	 * @param catagory
+	 * @return
+	 */
 	@GetMapping(value = "/list/{catagory}")
 	public ModelAndView list(@PathVariable(value = "catagory") String catagory) {
 		log.info("请求电影列表 ：" + catagory);
@@ -136,6 +162,11 @@ public class PageController {
 		return mav;
 	}
 
+	/**
+	 * 电影详情页面
+	 * @param id
+	 * @return
+	 */
 	@GetMapping(value = "/detail/{id}")
 	public ModelAndView detail(@PathVariable(value = "id") String id) {
 		log.info("movie id = " + id);
@@ -213,6 +244,11 @@ public class PageController {
 		return mav;
 	}
 
+	/**
+	 * 电影搜索逻辑
+	 * @param key
+	 * @return
+	 */
 	@GetMapping(value = "/search")
 	public ModelAndView search(@RequestParam(value = "key") String key) {
 		log.info("search for " + key);
@@ -241,6 +277,10 @@ public class PageController {
 		return mav;
 	}
 
+	/**
+	 * 检查用户登录状态
+	 * @param mav
+	 */
 	private void checkUserLogin(ModelAndView mav) {
 		User user = UserLoginUtil.currentUser;
 		if (user != null) {

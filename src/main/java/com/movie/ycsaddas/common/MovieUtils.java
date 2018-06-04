@@ -25,6 +25,12 @@ public class MovieUtils {
 	public static Map<String, List<MovieVO>> movieListMap = new HashMap<>();
 	public static Map<String, MovieVO> movieMap = new HashMap<>();
 
+	/**
+	 * 豆瓣查找接口
+	 * @param keyWord
+	 * @return
+	 * @throws Exception
+	 */
 	public static List<MovieVO> searchForMovie(String keyWord) throws Exception {
 		return parseMovies(DoubanClient.queryByType(keyWord));
 	}
