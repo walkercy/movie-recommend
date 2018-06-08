@@ -51,9 +51,9 @@
         </form>
         <button th:if="${login eq 0}" class="btn btn-outline-primary" data-toggle="modal" data-target="#myModal">登录</button>
         <div class="dropdown" th:if="${login eq 1}">
-            <button type="button" class="btn btn-outline-primary dropdown-toggle" data-toggle="dropdown" th:text="${name}"></button>
+            <button type="button" class="btn btn-outline-primary dropdown-toggle" data-toggle="dropdown" th:text="${user.username}"></button>
             <div class="dropdown-menu">
-                <a class="dropdown-item" href="#">搜索记录</a>
+                <a class="dropdown-item" th:href="'/user/' + ${user.username}">搜索记录</a>
                 <a id="logout" href="/" class="dropdown-item">登出</a>
             </div>
         </div>

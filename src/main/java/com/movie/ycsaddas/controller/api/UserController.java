@@ -2,14 +2,22 @@ package com.movie.ycsaddas.controller.api;
 
 import com.movie.ycsaddas.common.JsonResult;
 import com.movie.ycsaddas.common.UserLoginUtil;
+import com.movie.ycsaddas.entity.History;
+import com.movie.ycsaddas.entity.MovieComment;
 import com.movie.ycsaddas.entity.User;
+import com.movie.ycsaddas.repository.CommentRepository;
+import com.movie.ycsaddas.repository.HistoryRepository;
 import com.movie.ycsaddas.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
+import javax.xml.stream.events.Comment;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * @author walker
@@ -22,6 +30,12 @@ public class UserController {
 
 	@Autowired
 	private UserRepository userRepository;
+
+	@Autowired
+	private CommentRepository commentRepository;
+
+	@Autowired
+	private HistoryRepository historyRepository;
 
 	@PostMapping(value = "/login")
 	public String login(User user) {
@@ -64,4 +78,29 @@ public class UserController {
 			e.printStackTrace();
 		}
 	}
+
+	@PostMapping(value = "/detail")
+	public JsonResult test(@RequestParam String content, @RequestParam String movieId) {
+		System.out.println("content = " + content);
+		System.out.println("movieId = " + movieId);
+		MovieComment comment = new MovieComment();
+		comment.setContent(content);
+		comment.setUsername(UserLoginUtil.currentUser.getUsername());
+		comment.setDate(new Date());
+		comment.setMovieId(movieId);
+		commentRepository.save(comment);
+
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+		History history = new History();
+		history.setDate(sdf.format(new Date()));
+		history.setUsername(UserLoginUtil.currentUser.getUsername());
+		history.setMovieId(movieId);
+		history.setRate(1);
+		historyRepository.save(history);
+
+		return JsonResult.success(UserLoginUtil.currentUser.getUsername());
+	}
+
+
 }

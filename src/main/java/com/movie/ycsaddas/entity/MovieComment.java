@@ -3,17 +3,18 @@ package com.movie.ycsaddas.entity;
 import lombok.Data;
 
 import javax.persistence.*;
+import java.util.Date;
 
 /**
- * 电影评分
+ * 电影评分,评价表
  *
  * @author walker
  * @date 2018/06/03
  */
 @Data
 @Entity
-@Table(name = "yc_rate")
-public class MovieRate {
+@Table(name = "yc_comment")
+public class MovieComment {
 
 	@Id
 	@GeneratedValue
@@ -22,8 +23,12 @@ public class MovieRate {
 	@Column(name = "movie_id")
 	private String movieId;
 
-	@Column(name = "user_id")
-	private int userId;
+	private String username;
 
 	private int rate;
+
+	private String content;
+
+	@Column(name = "comm_date")
+	private Date date;
 }

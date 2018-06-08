@@ -4,9 +4,7 @@ import com.movie.ycsaddas.common.DoubanClient;
 import com.movie.ycsaddas.common.MovieUtils;
 import com.movie.ycsaddas.common.UserLoginUtil;
 import com.movie.ycsaddas.entity.*;
-import com.movie.ycsaddas.repository.ActorRepository;
-import com.movie.ycsaddas.repository.DirectorRepository;
-import com.movie.ycsaddas.repository.TypeRepository;
+import com.movie.ycsaddas.repository.*;
 import com.movie.ycsaddas.vo.MovieVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +37,15 @@ public class PageController {
 	// 记录电影类型频次的增删查改对象
 	@Autowired
 	private TypeRepository typeRepository;
+
+	@Autowired
+	private CommentRepository commentRepository;
+
+	@Autowired
+	private UserRepository userRepository;
+
+	@Autowired
+	private HistoryRepository historyRepository;
 
 	@GetMapping(value = "/")
 	public ModelAndView index() {
@@ -130,7 +137,9 @@ public class PageController {
 		}
 		if (recommends.size() < 6) {
 			for (int i = 0; i < 6 - recommends.size(); i++) {
-				recommends.add(defaultRecommends.get(i));
+				Random random = new Random();
+				int index = random.nextInt(defaultRecommends.size()) + 0;
+				recommends.add(defaultRecommends.get(index));
 			}
 		}
 		try {
@@ -174,6 +183,10 @@ public class PageController {
 		checkUserLogin(mav);
 		try {
 			MovieVO movie = MovieUtils.getDetail(id);
+			List<MovieComment> comments = commentRepository.findAllByMovieId(id);
+			if (comments == null || comments.size() == 0) {
+				log.info("comments is null");
+			}
 			if (UserLoginUtil.currentUser != null) {
 				List<RecommendActor> actors = new ArrayList<>();
 				movie.getActors().forEach(actor -> {
@@ -238,6 +251,7 @@ public class PageController {
 				}
 			}
 			mav.addObject("movie", movie);
+			mav.addObject("comments", comments);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -277,6 +291,26 @@ public class PageController {
 		return mav;
 	}
 
+	@GetMapping(value = "/user/{username}")
+	public ModelAndView userDetail(@PathVariable(value = "username") String username) {
+		ModelAndView mav = new ModelAndView("user");
+		log.info("用户详情页，username = " + username);
+		checkUserLogin(mav);
+		List<History> histories = historyRepository.findByUsernameOrderByDateDesc(username);
+		List<MovieVO> movies = new ArrayList<>();
+		histories.forEach(history -> {
+			try {
+				MovieVO movie = MovieUtils.getDetail(history.getMovieId());
+				movie.setRateDate(history.getDate());
+				movies.add(movie);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		});
+		mav.addObject("movies", movies);
+		return mav;
+	}
+
 	/**
 	 * 检查用户登录状态
 	 * @param mav
@@ -287,7 +321,7 @@ public class PageController {
 			log.info("登录用户是 ：" + user.getUsername());
 			log.info("登录用户ID是 ：" + user.getId());
 			mav.addObject("login", UserLoginUtil.userLoginMap.get(user.getId()));
-			mav.addObject("name", user.getUsername());
+			mav.addObject("user", user);
 			log.info("map size " + UserLoginUtil.userLoginMap.size());
 			log.info("登录状态为：" + UserLoginUtil.userLoginMap.get(user.getId()));
 		} else {
@@ -295,4 +329,5 @@ public class PageController {
 			mav.addObject("login", UserLoginUtil.logout);
 		}
 	}
+
 }

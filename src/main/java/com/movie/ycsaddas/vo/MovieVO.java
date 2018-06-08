@@ -2,6 +2,7 @@ package com.movie.ycsaddas.vo;
 
 import lombok.Data;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -38,4 +39,6 @@ public class MovieVO {
 	private String summary;
 	// 评分人数
 	private int ratings_count;
+	// 点评时间
+	private String rateDate;
 }

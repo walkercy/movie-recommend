@@ -39,6 +39,7 @@
                     </div>
                 </div>
                 <div class="row">
+                    <span type="hidden" th:data-movieid="${movie.id}" id="movieId"></span>
                     <div class="col-md-3 image">
                         <img th:src="${movie.img}" style="width:100%;">
                     </div>
@@ -52,14 +53,13 @@
                     </div>
                     <div class="col-md-3">
                         <small>豆瓣评分:</small>
-                        <h5 th:text="${movie.average}"></h5>
-                        <hr>
-                        <small>评分人数：</small>
-                        <h5 th:text="${movie.ratings_count}"></h5>
-                        <hr>
-                        <small>看过人数：</small>
-                        <h5 th:text="${movie.count}"></h5>
-                        <div th:if="${login eq 1}" id="test6"></div>
+                        <h5 th:text="${movie.average}"></h5><hr>
+                        <small>评分人数:</small>
+                        <h5 th:text="${movie.ratings_count}"></h5><hr>
+                        <small>看过人数:</small>
+                        <h5 th:text="${movie.count}"></h5><hr>
+                        <small th:if="${login eq 1}">为它评分:</small>
+                        <div th:if="${login eq 1}" id="rate"></div>
                     </div>
                 </div>
                 <div class="row" style="padding-top: 40px">
@@ -101,7 +101,17 @@
                 </div>
                 <div class="row">
                     <div class="input-group image col-md-12" style="height: 200px; padding-bottom: 50px">
-                        <textarea class="form-control" aria-label="With textarea" placeholder="写下你的评论......"></textarea>
+                        <textarea id="content" class="form-control" aria-label="With textarea" placeholder="写下你的评论......"></textarea>
+                        <span id="comment" class="input-group-addon">发表</span>
+                    </div>
+                </div>
+                <span th:if="${login eq 1}" type="hidden" id="username" th:data-username="${user.username}"></span>
+                <div id="comment2">
+                    <div class="row" th:each="comment : ${comments}">
+                        <div class="col">
+                            <a th:href="'/user/' + ${comment.username}" th:text="${comment.username}"></a><br>
+                            <h7 th:text="${comment.content}"></h7><hr>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -110,12 +120,12 @@
                     <h5>私人角度成员常用标签······</h5>
                 </div>
                 <div class="row">
-                    <a href="#" class="btn btn-light" role="button">漫威</a>
-                    <a href="#" class="btn btn-light" role="button">超级英雄</a>
-                    <a href="#" class="btn btn-light" role="button">科幻</a>
-                    <a href="#" class="btn btn-light" role="button">美国</a>
-                    <a href="#" class="btn btn-light" role="button">2018</a>
-                    <a href="#" class="btn btn-light" role="button">动作</a>
+                    <a href="/search?key=漫威" class="btn btn-light" role="button">漫威</a>
+                    <a href="/search?key=超级英雄" class="btn btn-light" role="button">超级英雄</a>
+                    <a href="/search?key=科幻" class="btn btn-light" role="button">科幻</a>
+                    <a href="/search?key=美国" class="btn btn-light" role="button">美国</a>
+                    <a href="/search?key=2018" class="btn btn-light" role="button">2018</a>
+                    <a href="/search?key=动作" class="btn btn-light" role="button">动作</a>
                 </div>
                 <hr>
                 <div class="row">
@@ -161,14 +171,12 @@
     </div>
 <script th:src="@{/index.js}"></script>
 <script th:src="@{/layui/layui.js}"></script>
-</body>
-</html>
-<script type="text/javascript">
+<script th:inline="javascript">
     layui.use(['rate'], function() {
         var rate = layui.rate;
         rate.render({
-            elem: '#test6'
-            ,value: 1.5
+            elem: '#rate'
+            ,value: 0.0
             ,half: true
             ,text: true
             ,setText: function(value){
@@ -176,4 +184,29 @@
             }
         })
     });
+
+    $('#comment').click(function () {
+        var content = $('#content').val()
+        var movieId = $('#movieId').data("movieid");
+        var username = $('#username').data("username");
+        console.log(content)
+        console.log(movieId)
+        console.log(username)
+        var data = {
+            "content" : content,
+            "movieId" : movieId
+        }
+        $.ajax({
+            url : "/api/user/detail",
+            type : "post",
+            data : data,
+            success : function (res) {
+                console.log(res.data)
+                $('#comment2').prepend("<div class=\"row\"><div class=\"col\">" +
+                    "<a href=\"/user/" + username + "\">" + res.data + "</a><br><h7>" + content + "</h7><hr></div></div>")
+            }
+        })
+    })
 </script>
+</body>
+</html>

@@ -72,8 +72,13 @@ public class MovieUtils {
 	 * @throws Exception
 	 */
 	public static MovieVO getDetail(String id) throws Exception {
+		MovieVO movie = parseMovieDetail(DoubanClient.getMovieDetail(id));
+		if (movie == null) {
+			log.warn("the movie : " + id + " is null");
+			return null;
+		}
 		if (movieMap.get(id) == null ) {
-			movieMap.put(id, parseMovieDetail(DoubanClient.getMovieDetail(id)));
+			movieMap.put(id, movie);
 		}
 		return movieMap.get(id);
 	}
@@ -109,6 +114,8 @@ public class MovieUtils {
 		JSONObject subject = JSONObject.parseObject(movies);
 		if (subject != null) {
 			log.info(subject.toJSONString());
+		} else {
+			return null;
 		}
 		movie.setId(subject.getString("id"));
 		movie.setImg(subject.getJSONObject("images").getString("large"));
